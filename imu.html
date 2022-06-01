@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<title>ModalAI VOXL Portal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="./css/w3.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<header>
+    <script src="./js/jquery-3.6.0.js"></script>
+    <script>
+    $(function(){
+      $("#header").load("header.html");
+    });
+    </script>
+    <div id="header" class="w3-container w3-green" style="height:50px; align-items: center; display:flex;">
+        <h1>VOXL Web Portal</h1>
+    </div>
+</header>
+
+<body>
+
+<div class="w3-container w3-center" id="main-page">
+<h3>VOXL Imu Plotter</h3>
+<div id="graph"></div>
+<a>Gyro:   </a>
+<button class="w3-button w3-red" type='button' id="g_x">X</button>
+<button class="w3-button w3-red" type='button' id="g_y">Y</button>
+<button class="w3-button w3-red" type='button' id="g_z">Z</button>
+<a>Accel:   </a>
+<button class="w3-button w3-red" type='button' id="a_x">X</button>
+<button class="w3-button w3-red" type='button' id="a_y">Y</button>
+<button class="w3-button w3-red" type='button' id="a_z">Z</button><br><br>
+<button class="w3-button w3-blue" type='button' id="plot" onclick="plotFunc()">Plot</button>
+<button class="w3-button w3-blue" type='button' id="plot" onclick="pauseFunc()">Pause</button>
+<button class="w3-button w3-blue" type='button' id="plot" onclick="clearFunc()">Clear</button>
+</div>
+
+<script src="./js/3rd_party/jdataview.js"></script>
+<script src="./js/3rd_party/jparser.js"></script>
+<script src="./js/3rd_party/plotly-2.4.2.min.js"></script>
+
+
+<script>
+let interval;
+let plot = false;
+
+var graph = document.getElementById('graph');
+var layout = {
+  xaxis:{
+    range:[0,100],
+    autorange: true
+  },
+  yaxis:{
+    autorange: true
+  }
+}
+
+var time = new Date();
+
+Plotly.newPlot( graph, [{
+	x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'g_x',
+},
+{
+    x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'g_y',
+},
+{
+    x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'g_z',
+},
+{
+    x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'a_x',
+},
+{
+    x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'a_y',
+},
+{
+    x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'a_z',
+}], layout, {displayModeBar: true, modeBarButtonsToRemove: ['toImage']} );
+
+
+var g_x_btn = document.getElementById('g_x');
+var g_y_btn = document.getElementById('g_y');
+var g_z_btn = document.getElementById('g_z');
+var a_x_btn = document.getElementById('a_x');
+var a_y_btn = document.getElementById('a_y');
+var a_z_btn = document.getElementById('a_z');
+
+g_x_btn.addEventListener("click", () => {
+    if (g_x_btn.classList.contains("w3-red")) {
+        g_x_btn.className = "w3-button w3-green";
+    }
+    else {
+        g_x_btn.className = "w3-button w3-red";
+    }
+})
+
+g_y_btn.addEventListener("click", () => {
+    if (g_y_btn.classList.contains("w3-red")) {
+        g_y_btn.className = "w3-button w3-green";
+    }
+    else {
+        g_y_btn.className = "w3-button w3-red";
+    }
+})
+
+g_z_btn.addEventListener("click", () => {
+    if (g_z_btn.classList.contains("w3-red")) {
+        g_z_btn.className = "w3-button w3-green";
+    }
+    else {
+        g_z_btn.className = "w3-button w3-red";
+    }
+})
+
+a_x_btn.addEventListener("click", () => {
+    if (a_x_btn.classList.contains("w3-red")) {
+        a_x_btn.className = "w3-button w3-green";
+    }
+    else {
+        a_x_btn.className = "w3-button w3-red";
+    }
+})
+
+a_y_btn.addEventListener("click", () => {
+    if (a_y_btn.classList.contains("w3-red")) {
+        a_y_btn.className = "w3-button w3-green";
+    }
+    else {
+        a_y_btn.className = "w3-button w3-red";
+    }
+})
+
+a_z_btn.addEventListener("click", () => {
+    if (a_z_btn.classList.contains("w3-red")) {
+        a_z_btn.className = "w3-button w3-green";
+    }
+    else {
+        a_z_btn.className = "w3-button w3-red";
+    }
+})
+
+var url = window.location.href;
+var url_partial = url.split("/");
+console.log(url_partial[2]);
+
+var imu_ws = new WebSocket("ws://" + url_partial[2] + ":80/imu");
+imu_ws.binaryType = "arraybuffer";
+
+function pauseFunc() {
+    plot = false;
+}
+
+function clearFunc() {
+    Plotly.newPlot( graph, [{
+	x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'g_x',
+},
+{
+    x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'g_y',
+},
+{
+    x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'g_z',
+},
+{
+    x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'a_x',
+},
+{
+    x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'a_y',
+},
+{
+    x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'a_z',
+}], layout, {displayModeBar: true, modeBarButtonsToRemove: ['toImage']} );
+}
+
+let timerId = 0;
+
+function keepAlive(timeout = 20000) {
+    if (imu_ws.readyState == imu_ws.OPEN) {
+        imu_ws.send('');
+    }
+    timerId = setTimeout(keepAlive, timeout);
+}
+
+function cancelKeepAlive() {
+    if (timerId) {
+        clearTimeout(timerId);
+    }
+}
+
+keepAlive();
+
+var recvd_smps = 0;
+imu_ws.onmessage = function (evt) {
+    if (plot){
+        if (recvd_smps != 5){
+            recvd_smps++;
+            return;
+        }
+        recvd_smps = 0;
+        var msg = evt.data;
+        var parser = new jParser(msg, {
+            // imu_meta: {
+            //     n_packets: 'int32'
+            // },
+            imu_data: {
+                magic_number: 'uint32',
+                accl_ms2: ['array', 'float32', 3],
+                gyro_rad: ['array', 'float32', 3],
+                temp_c: 'float32',
+                timestamp_ns: 'uint64'
+            },
+        });
+
+        var temp_ind = [];
+        var temp_x = [];
+        var temp_y = [];
+
+        var plot_g_x = g_x_btn.classList.contains("w3-green");
+        var plot_g_y = g_y_btn.classList.contains("w3-green");
+        var plot_g_z = g_z_btn.classList.contains("w3-green");
+        var plot_a_x = a_x_btn.classList.contains("w3-green");
+        var plot_a_y = a_y_btn.classList.contains("w3-green");
+        var plot_a_z = a_z_btn.classList.contains("w3-green");
+
+        var curr_imu = parser.parse('imu_data');
+
+        var g_x = curr_imu.gyro_rad[0];
+        var g_y = curr_imu.gyro_rad[1];
+        var g_z = curr_imu.gyro_rad[2];
+        var a_x = curr_imu.accl_ms2[0];
+        var a_y = curr_imu.accl_ms2[1];
+        var a_z = curr_imu.accl_ms2[2];
+
+        var time_bck = new Date();
+        var time = new Date();
+
+        if (plot_g_x){
+            temp_x.push([time]);
+            temp_y.push([g_x]);
+            temp_ind.push(0);
+        }
+        if (plot_g_y){
+            temp_x.push([time]);
+            temp_y.push([g_y]);
+            temp_ind.push(1);
+        }
+        if (plot_g_z){
+            temp_x.push([time]);
+            temp_y.push([g_z]);
+            temp_ind.push(2);
+        }
+        if (plot_a_x){
+            temp_x.push([time]);
+            temp_y.push([a_x]);
+            temp_ind.push(3);
+        }
+        if (plot_a_y){
+            temp_x.push([time]);
+            temp_y.push([a_y]);
+            temp_ind.push(4);
+        }
+        if (plot_a_z){
+            temp_x.push([time]);
+            temp_y.push([a_z]);
+            temp_ind.push(5);
+        }
+
+        var update = {
+            x: temp_x,
+            y: temp_y
+        }
+        Plotly.extendTraces(graph, update, temp_ind);
+
+        time_bck.setSeconds(time.getSeconds() - 7);
+        Plotly.relayout('graph', {'xaxis.range': [time_bck, time]});
+    }
+}
+
+function plotFunc() {
+    plot = true;
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<title>ModalAI VOXL Portal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="./css/w3.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<div class="w3-container w3-green" style="height:50px; align-items: center; display:flex;">
+    <h1><a href="/" id="home" style="text-decoration: none; font-size: xx-large;">VOXL Web Portal</a></h1>
+    <div style="flex-grow: 1;"></div>
+    <button id='debug_list' class="w3-button"  style="float: right;" onclick="listDebug()">
+        Debug &#9660;
+    </button>
+    <div id="debugAcc" class="w3-hide w3-white w3-card" style="float: right;">
+        <a id='imu' class="w3-hide w3-bar-item w3-button w3-green" style="float: right;"  onclick="window.location.href = './imu.html'">Imu</a>
+        <a id='cpu' class="w3-hide w3-bar-item w3-button w3-green" style="float: right;"  onclick="window.location.href = './cpu.html'">Cpu</a>
+    </div>
+    <button class="w3-button"  style="float: right;" onclick="window.location.href = './mapper.html';">
+        Map
+    </button>
+    <div id="div1" class="fa">
+        <button class="w3-button" style="float: right;" id="battery">
+            ?%
+            <i class='fas fa-battery-three-quarters'></i>
+        </button>
+    </div>
+    <button class="w3-button" style="float: right;" id="gps">
+        GPS Sat: N/A
+    </button>
+    <label class="switch">
+        <input class="w3-button w3-block w3-black" id="mode_btn" type="checkbox">
+        <span class="slider round"></span>
+    </label>
+
+</div>
+
+<body>
+    <div class="w3-container">
+        <div class="w3-padding-64 w3-display-topmiddle" style="display: table;">
+            <button class="w3-button w3-blue-grey" style="float: left;" id="2d">2D View</button>
+            <button class="w3-button w3-dark-grey" style="float: left;" id="3d">3D View</button>
+            <button class="w3-button w3-dark-grey" style="float: left;" id="sat">Satellite View</button>
+        </div>
+
+        <div id="stream_div" class="w3-display-left resizable">
+            <img src="" id="stream0" class="w3-hide" height="35%" width="35%" object-fit: cover/>
+        </div>
+
+        <div class="w3-display-bottomleft">
+            <div id="cameraAcc" class="w3-hide w3-white w3-card"></div>
+            <button class="w3-button w3-dark-grey" id="stream_add">
+                <i class='fa fa-tv'></i>
+            </button>
+            <button id="stream_remove" class="w3-hide w3-button w3-red">x</button>
+
+        </div>
+
+        <div class="w3-display-right">
+            <button class="w3-button w3-block w3-blue" id="plan_action">Plan Home</button>
+            <button class="w3-button w3-block w3-blue" id="plan_point_action">Plan to a Point</button>
+            <button class="w3-hide w3-button w3-green" id="plan_point_go">GO!</button>
+            <button class="w3-hide w3-button w3-red" id="plan_point_back">Back</button>
+            <button class="w3-button w3-block w3-blue" id="load_action">Load Map</button>
+            <form id="load_form" style="display: none;">
+                <span class="w3-tag w3-blue">File Name:</span>
+                <input type="text" id="load_file_name" name="load_file_name"><br>
+                <button class="w3-button w3-block w3-blue" type='button' id="load_sub_action">Load Map</button>
+                <button class="w3-button w3-block w3-red" type='button' id="load_back">Back</button>
+            </form>
+            <button class="w3-button w3-block w3-blue" id="save_action">Save Map</button>
+            <form id="save_form" style="display: none;">
+                <span class="w3-tag w3-blue">File Name:</span>
+                <input type="text" id="save_file_name" name="save_file_name"><br>
+                <button class="w3-button w3-block w3-blue" type='button' id="save_sub_action">Save Map</button>
+                <button class="w3-button w3-block w3-red" type='button' id="save_back">Back</button>
+            </form>
+            <button class="w3-button w3-block w3-blue" id="clear_action">Clear Map</button>
+            <button class="w3-button w3-block w3-blue" id="reset_action">Reset VIO</button>
+
+            <form id="path_form" style="display: none;">
+                <label for="file_name">File name:</label><br>
+                <input type="text" id="file_name" name="file_name"><br>
+                <button class="w3-button w3-block w3-blue" type='button' id="sub_action">Load Map</button>
+            </form>
+            <button class="w3-hide w3-button w3-block w3-green" id="pose_btn">Position</button>
+            <button class="w3-hide w3-button w3-block w3-red" id="path_btn">Paths</button>
+            <button class="w3-hide w3-button w3-block w3-red" id="ptcloud_btn">Pointcloud</button>
+        </div>
+        <div class="w3-padding-64 w3-display-bottommiddle">
+            <button style="float: left;" class="w3-hide w3-button w3-green" id="path_go">Go</button>
+            <button style="float: left;" class="w3-hide w3-button w3-red" id="path_stop">Stop</button>
+            <button style="float: left;" class="w3-hide w3-button w3-orange" id="path_pause">Pause</button>
+            <button style="float: left;" class="w3-hide w3-button w3-teal" id="path_land">Land</button>
+        </div>
+    </div>
+
+    <script src="./js/3rd_party/jdataview.js"></script>
+    <script src="./js/3rd_party/jparser.js"></script>
+    <script src="./js/3rd_party/math.min.js"></script>
+
+    <script>
+
+function listDebug() {
+    console.log("list debug");
+    var imu_btn = document.getElementById('imu');
+    var cpu_btn = document.getElementById('cpu');
+    var dbg_btn = document.getElementById('debugAcc')
+    var dbg_list = document.getElementById('debug_list');
+
+    if (imu_btn.classList.contains("w3-hide")) {
+        imu_btn.className = "w3-bar-item w3-button w3-green";
+        cpu_btn.className = "w3-bar-item w3-button w3-green";
+        dbg_btn.className = "w3-show";
+        dbg_list.className = "w3-button w3-white";
+    }
+    else {
+        imu_btn.className = "w3-hide";
+        cpu_btn.className = "w3-hide";
+        dbg_btn.className += "w3-hide w3-white w3-card";
+        dbg_list.className = "w3-button w3-green";
+    }
+}
+
+var url = window.location.href;
+var url_partial = url.split("/");
+console.log(url_partial[2]);
+
+var batt_ws = new WebSocket("ws://" + url_partial[2] + ":80/battery");
+batt_ws.binaryType = "arraybuffer";
+
+var gps_ws = new WebSocket("ws://" + url_partial[2] + ":80/gps");
+gps_ws.binaryType = "arraybuffer";
+
+batt_ws.onmessage = function (evt) {
+    var msg = evt.data;
+    var parser = new jParser(msg, {
+        batt_msg: {
+                volts: 'float64',
+                percent: 'uint8',
+                current: 'float64'
+            },
+        });
+
+    var battery = parser.parse('batt_msg');
+    var batt_ele = document.getElementById("battery");
+    batt_ele.innerHTML = battery.percent + "% <i class='fas fa-battery-three-quarters'></i>";
+}
+
+gps_ws.onmessage = function (evt) {
+    var msg = evt.data;
+    var parser = new jParser(msg, {
+        sat_msg: {
+                sats: 'uint8',
+            },
+        });
+
+    var sats = parser.parse('sat_msg');
+    var gps_ele = document.getElementById("gps");
+    gps_ele.innerHTML = "GPS Sat: " + sats.sats;
+}
+
+
+    </script>
+
+    <script>
+        var script = document.createElement("script");
+        script.type = "module";
+        script.src = "./js/mapper.js";
+        document.getElementsByTagName("body")[0].appendChild(script);
+    </script>
+</body>
+
+</html>

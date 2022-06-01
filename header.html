@@ -1,0 +1,157 @@
+
+
+<link rel="stylesheet" href="./css/w3.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<script src="./js/3rd_party/jdataview.js"></script>
+<script src="./js/3rd_party/jparser.js"></script>
+
+<h1>
+    <a href="/" style="text-decoration: none; font-size: xx-large;">
+        VOXL Web Portal
+    </a>
+</h1>
+<div style="flex-grow: 1;"></div>
+<div class="w3-dropdown-click"  onmouseenter="cameraAccFunc()" onmouseleave="closeCameraAcc()" >
+    <button class="w3-button">
+        Cameras &#9660;
+    </button>
+    <div id="cameraAcc" class="w3-dropdown-content w3-bar-block" >
+        <!-- This list gets populated by updateCameraList() -->
+    </div>
+</div>
+<div class="w3-dropdown-hover">
+    <button class="w3-button"  onclick="listDebug()">
+        Debug &#9660;
+    </button>
+    <div id="debugAcc" class="w3-dropdown-content w3-bar-block w3-border" >
+        <a class="w3-bar-item w3-button w3-green w3-border"  onclick="window.location.href = './imu.html'">Imu</a>
+        <a class="w3-bar-item w3-button w3-green w3-border"  onclick="window.location.href = './cpu.html'">Cpu</a>
+    </div>
+</div>
+<div class="w3-container" id="battery">
+    ?%
+    <i class='fa fa-battery-three-quarters'></i>
+</div>
+<div class="w3-container" id="gps">
+    GPS Sat: N/A
+</div>
+
+<script >
+
+function closeCameraAcc(){
+
+  //Close and remove the green coloring of the dropdown
+  var x = document.getElementById("cameraAcc");
+  x.classList.remove("w3-show");
+  x.previousElementSibling.classList.remove("w3-pale-green");
+
+  //Remove all the children, they should get repopulated to ensure no faulty cameras
+  var eles = document.getElementsByClassName("cam-item");
+  while(eles[0]) {
+    eles[0].parentNode.removeChild(eles[0]);
+  }
+
+}
+
+var camListWaiting = 0;
+function cameraAccFunc() {
+  var x = document.getElementById("cameraAcc");
+    if(camListWaiting == 0){
+        camListWaiting = 1;
+        updateCameraList();
+    }
+}
+
+function updateCameraList(){
+  fetch('/_cmd/list_cameras').then(function(response) {
+    return response.text().then(function(text) {
+      camListWaiting = 0;
+      var y = document.getElementById("cameraAcc");
+      var cams = text.split(" ");
+
+      for(var i = 0; i < cams.length; i++){
+        if(cams[i].length < 1) continue;
+
+        var ele = document.createElement("a");
+        ele.setAttribute("id",       "btn_"+cams[i]);
+        ele.setAttribute("pipe",     cams[i]);
+        ele.setAttribute("onclick",  "cameraClick(this)");
+
+        ele.classList.add("cam-item");
+        ele.classList.add("w3-bar-item");
+        ele.classList.add("w3-button");
+        ele.classList.add("w3-green");
+        ele.classList.add("w3-border");
+
+        ele.textContent =getNiceName(cams[i]);
+        y.appendChild(ele);
+      }
+
+      y.className += " w3-show";
+      y.previousElementSibling.className += " w3-pale-green";
+
+    });
+  });
+
+}
+
+function getNiceName(string) {
+    var nameList = string.split("_");
+    for(var j = 0; j < nameList.length; j++){
+      if(nameList[j].length < 1) continue;
+      nameList[j] = nameList[j][0].toUpperCase() + nameList[j].substring(1);
+    }
+    return nameList.join(' ');
+}
+
+function cameraClick(ele) {
+    window.location.href = './video.html?cam=' + ele.getAttribute("pipe");
+}
+
+function listDebug() {
+  var x = document.getElementById("debugAcc");
+  x.classList.toggle("w3-show");
+}
+
+var url = window.location.href;
+var url_partial = url.split("/");
+console.log(url_partial[2]);
+
+var batt_ws = new WebSocket("ws://" + url_partial[2] + ":80/battery");
+batt_ws.binaryType = "arraybuffer";
+
+var gps_ws = new WebSocket("ws://" + url_partial[2] + ":80/gps");
+gps_ws.binaryType = "arraybuffer";
+
+batt_ws.onmessage = function (evt) {
+    var msg = evt.data;
+    var parser = new jParser(msg, {
+        batt_msg: {
+                volts: 'float64',
+                percent: 'uint8',
+                current: 'float64'
+            },
+        });
+
+    var battery = parser.parse('batt_msg');
+    var batt_ele = document.getElementById("battery");
+    if (battery.percent > 100) batt_ele.innerHTML = "N/A% <i class='fa fa-battery-three-quarters'></i>";
+    else batt_ele.innerHTML = battery.percent + "% <i class='fa fa-battery-three-quarters'></i>";
+}
+
+gps_ws.onmessage = function (evt) {
+    var msg = evt.data;
+    var parser = new jParser(msg, {
+        sat_msg: {
+                sats: 'uint8',
+            },
+        });
+
+    var sats = parser.parse('sat_msg');
+    var gps_ele = document.getElementById("gps");
+    gps_ele.innerHTML = "GPS Sat: " + sats.sats;
+}
+
+
+</script>

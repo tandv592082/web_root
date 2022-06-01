@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html>
+<title>ModalAI VOXL Portal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="./css/w3.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<header>
+    <script src="./js/jquery-3.6.0.js"></script>
+    <script>
+    $(function(){
+      $("#header").load("header.html");
+    });
+    </script>
+    <div id="header" class="w3-container w3-green" style="height:50px; align-items: center; display:flex;">
+        <h1>VOXL Web Portal</h1>
+    </div>
+</header>
+
+<body>
+
+<div class="w3-container w3-center" id="main-page">
+<h3>VOXL Cpu Plotter</h3>
+<a id="term_cpu0" class="terminal__prompt--text">cpu0         xxx       xxx      xxx</a><br>
+<a id="term_cpu1" class="terminal__prompt--text">cpu1         xxx       xxx      xxx</a><br>
+<a id="term_cpu2" class="terminal__prompt--text">cpu2         xxx       xxx      xxx</a><br>
+<a id="term_cpu3" class="terminal__prompt--text">cpu3         xxx       xxx      xxx</a><br>
+<a id="term_cpu_tot" class="terminal__prompt--text">Total                           xxx</a><br>
+
+<div id="graph"></div>
+
+
+<a>Cores:   </a>
+<button class="w3-button w3-red" type='button' id="cpu0">cpu0</button>
+<button class="w3-button w3-red" type='button' id="cpu1">cpu1</button>
+<button class="w3-button w3-red" type='button' id="cpu2">cpu2</button>
+<button class="w3-button w3-red" type='button' id="cpu3">cpu3</button>
+<button class="w3-button w3-red" type='button' id="cpu_total">Total</button>
+
+<a>GPU:   </a>
+<button class="w3-button w3-red" type='button' id="gpu">GPU</button>
+<button class="w3-button w3-red" type='button' id="gpu_lp">GPU low-pass</button>
+
+<a>Memory:   </a>
+<button class="w3-button w3-red" type='button' id="mem_temp">memory temp</button>
+<button class="w3-button w3-red" type='button' id="mem_used">memory used</button>
+
+<br><br>
+
+<a>Cores Plot Value:   </a>
+<select id="cores_plot">
+    <option value="0">Select Plot Option:</option>
+    <option value="1">Frequency(MHz)</option>
+    <option value="2">Temp(C)</option>
+    <option value="3">Util(%)</option>
+</select>
+
+<a>GPU Plot Value:   </a>
+<select id="gpu_plot">
+    <option value="0">Select Plot Option:</option>
+    <option value="1">Frequency(MHz)</option>
+    <option value="2">Temp(C)</option>
+    <option value="3">Util(%)</option>
+</select>
+<br><br>
+<button class="w3-button w3-blue" type='button' id="plot" onclick="plotFunc()">Plot</button>
+<button class="w3-button w3-blue" type='button' id="plot" onclick="pauseFunc()">Pause</button>
+<button class="w3-button w3-blue" type='button' id="plot" onclick="clearFunc()">Clear</button><br><br>
+
+</div>
+
+<script src="./js/3rd_party/jdataview.js"></script>
+<script src="./js/3rd_party/jparser.js"></script>
+<script src="./js/3rd_party/plotly-2.4.2.min.js"></script>
+
+
+<script>
+let interval = false;
+
+var graph = document.getElementById('graph');
+var layout = {
+  xaxis:{
+    range:[0,100],
+    autorange: true
+  },
+  yaxis:{
+    autorange: true
+  }
+}
+
+var time = new Date();
+
+Plotly.newPlot( graph, [{
+	x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'cpu0',
+},
+{
+    x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'cpu1',
+},
+{
+    x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'cpu2',
+},
+{
+    x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'cpu3',
+},
+{
+    x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'Total cpu',
+},
+{
+    x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'gpu',
+},
+{
+    x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'gpu low-pass',
+},
+{
+    x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'memory temp',
+},
+{
+    x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'memory_used',
+}], layout, {displayModeBar: true, modeBarButtonsToRemove: ['toImage']} );
+
+var cpu0_btn = document.getElementById('cpu0');
+var cpu1_btn = document.getElementById('cpu1');
+var cpu2_btn = document.getElementById('cpu2');
+var cpu3_btn = document.getElementById('cpu3');
+var cpu_total_btn = document.getElementById('cpu_total');
+
+var gpu_btn = document.getElementById('gpu');
+var gpu_lp_btn = document.getElementById('gpu_lp');
+
+var mem_temp_btn = document.getElementById('mem_temp');
+var mem_used_btn = document.getElementById('mem_used');
+
+var cpu_opt = document.getElementById('cores_plot');
+var gpu_opt = document.getElementById('gpu_plot');
+
+cpu0_btn.addEventListener("click", () => {
+    if (cpu0_btn.classList.contains("w3-red")) {
+        cpu0_btn.className = "w3-button w3-green";
+    }
+    else {
+        cpu0_btn.className = "w3-button w3-red";
+    }
+})
+
+cpu1_btn.addEventListener("click", () => {
+    if (cpu1_btn.classList.contains("w3-red")) {
+        cpu1_btn.className = "w3-button w3-green";
+    }
+    else {
+        cpu1_btn.className = "w3-button w3-red";
+    }
+})
+
+cpu2_btn.addEventListener("click", () => {
+    if (cpu2_btn.classList.contains("w3-red")) {
+        cpu2_btn.className = "w3-button w3-green";
+    }
+    else {
+        cpu2_btn.className = "w3-button w3-red";
+    }
+})
+
+cpu3_btn.addEventListener("click", () => {
+    if (cpu3_btn.classList.contains("w3-red")) {
+        cpu3_btn.className = "w3-button w3-green";
+    }
+    else {
+        cpu3_btn.className = "w3-button w3-red";
+    }
+})
+
+cpu_total_btn.addEventListener("click", () => {
+    if (cpu_total_btn.classList.contains("w3-red")) {
+        cpu_total_btn.className = "w3-button w3-green";
+    }
+    else {
+        cpu_total_btn.className = "w3-button w3-red";
+    }
+})
+
+gpu_btn.addEventListener("click", () => {
+    if (gpu_btn.classList.contains("w3-red")) {
+        gpu_btn.className = "w3-button w3-green";
+    }
+    else {
+        gpu_btn.className = "w3-button w3-red";
+    }
+})
+
+gpu_lp_btn.addEventListener("click", () => {
+    if (gpu_lp_btn.classList.contains("w3-red")) {
+        gpu_lp_btn.className = "w3-button w3-green";
+    }
+    else {
+        gpu_lp_btn.className = "w3-button w3-red";
+    }
+})
+
+mem_temp_btn.addEventListener("click", () => {
+    if (mem_temp_btn.classList.contains("w3-red")) {
+        mem_temp_btn.className = "w3-button w3-green";
+    }
+    else {
+        mem_temp_btn.className = "w3-button w3-red";
+    }
+})
+
+mem_used_btn.addEventListener("click", () => {
+    if (mem_used_btn.classList.contains("w3-red")) {
+        mem_used_btn.className = "w3-button w3-green";
+    }
+    else {
+        mem_used_btn.className = "w3-button w3-red";
+    }
+})
+
+var url = window.location.href;
+var url_partial = url.split("/");
+console.log(url_partial[2]);
+
+var cpu_ws = new WebSocket("ws://" + url_partial[2] + ":80/cpu");
+cpu_ws.binaryType = "arraybuffer";
+
+
+let timerId = 0;
+
+function keepAlive(timeout = 20000) {
+    if (cpu_ws.readyState == cpu_ws.OPEN) {
+        imucpu_ws_ws.send('');
+    }
+    timerId = setTimeout(keepAlive, timeout);
+}
+
+function cancelKeepAlive() {
+    if (timerId) {
+        clearTimeout(timerId);
+    }
+}
+
+keepAlive();
+
+function pauseFunc() {
+    interval = false;
+}
+
+function clearFunc() {
+    Plotly.newPlot( graph, [{
+	x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'cpu0',
+},
+{
+    x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'cpu1',
+},
+{
+    x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'cpu2',
+},
+{
+    x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'cpu3',
+},
+{
+    x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'Total cpu',
+},
+{
+    x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'gpu',
+},
+{
+    x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'gpu low-pass',
+},
+{
+    x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'memory temp',
+},
+{
+    x: [time],
+    y: [0],
+    mode: 'lines',
+    name: 'memory_used',
+}], layout, {displayModeBar: true, modeBarButtonsToRemove: ['toImage']} );
+}
+
+function plotFunc() {
+    interval = true;
+}
+
+cpu_ws.onmessage = function (evt) {
+    var cnt = 0;
+    var num_traces = 0;
+
+    var plot_cpu0 = cpu0_btn.classList.contains("w3-green");
+    var plot_cpu1 = cpu1_btn.classList.contains("w3-green");
+    var plot_cpu2 = cpu2_btn.classList.contains("w3-green");
+    var plot_cpu3 = cpu3_btn.classList.contains("w3-green");
+    var plot_cpu_total = cpu_total_btn.classList.contains("w3-green");
+
+    var plot_gpu = gpu_btn.classList.contains("w3-green");
+    var plot_gpu_lp = gpu_lp_btn.classList.contains("w3-green");
+
+    var plot_mem_temp = mem_temp_btn.classList.contains("w3-green");
+    var plot_mem_used = mem_used_btn.classList.contains("w3-green");
+
+    var msg = evt.data;
+
+    var parser = new jParser(msg, {
+        cpu_stats_t: {
+                magic_number: 'uint32',
+                num_cpu: 'int32',
+                cpu_freq: ['array', 'float32', 8],
+                cpu_t: ['array', 'float32', 8],
+                cpu_t_max: 'float32',
+                cpu_load: ['array', 'float32', 8],
+                cpu_load_10s: 'float32',
+                total_cpu_load: 'float32',
+                gpu_freq: 'float32',
+                gpu_t: 'float32',
+                gpu_load: 'float32',
+                gpu_load_10s: 'float32',
+                mem_t: 'float32',
+                mem_total_mb: 'float32',
+                mem_use_mb: 'int32',
+                flags: 'uint32',
+                reserved: 'uint32'
+            },
+    });
+
+    var cpu_msg = parser.parse('cpu_stats_t');
+
+    // cpu term
+    document.getElementById('term_cpu0').innerHTML = "cpu0       " + String(cpu_msg.cpu_freq[0].toFixed(1)) + "MHz     "    + cpu_msg.cpu_t[0].toFixed(1) + "C    " + String(cpu_msg.cpu_load[0].toFixed(2))+"%";
+    document.getElementById('term_cpu1').innerHTML = "cpu1       " + String(cpu_msg.cpu_freq[1].toFixed(1)) + "MHz     "    + cpu_msg.cpu_t[1].toFixed(1) + "C    " + String(cpu_msg.cpu_load[1].toFixed(2))+"%";
+    document.getElementById('term_cpu2').innerHTML = "cpu2       " + String(cpu_msg.cpu_freq[2].toFixed(1)) + "MHz     "    + cpu_msg.cpu_t[2].toFixed(1) + "C    " + String(cpu_msg.cpu_load[2].toFixed(2))+"%";
+    document.getElementById('term_cpu3').innerHTML = "cpu3       " + String(cpu_msg.cpu_freq[3].toFixed(1)) + "MHz     "    + cpu_msg.cpu_t[3].toFixed(1) + "C    " + String(cpu_msg.cpu_load[3].toFixed(2))+"%";
+    document.getElementById('term_cpu_tot').innerHTML = "Total                         " + String(cpu_msg.total_cpu_load.toFixed(2)) + "%";
+
+    if (interval){
+        var cpu_plot_type = cpu_opt.value;
+        if (cpu_plot_type == 0) cpu_plot_type = 3;
+        var gpu_plot_type = gpu_opt.value;
+        if (gpu_plot_type == 0) gpu_plot_type = 3;
+
+        let cpu_vals, gpu_vals;
+
+        switch (cpu_plot_type){
+            case "1":
+                cpu_vals = Array.from(cpu_msg.cpu_freq);
+                gpu_vals = cpu_msg.gpu_freq;
+                break;
+            case "2":
+                cpu_vals = Array.from(cpu_msg.cpu_t);
+                gpu_vals = cpu_msg.gpu_t;
+                break;
+            case "3":
+                cpu_vals = Array.from(cpu_msg.cpu_load);
+                cpu_vals = cpu_msg.cpu_load;
+                gpu_vals = cpu_msg.gpu_load;
+                break;
+            default:
+                console.log("uh oh, unknown format");
+        }
+
+        var time = new Date();
+        var time_bck = new Date();
+
+        var temp_ind = [];
+        var temp_x = [];
+        var temp_y = [];
+
+        if (plot_cpu0){
+            temp_x.push([time]);
+            temp_y.push([cpu_vals[0]]);
+            temp_ind.push(0);
+        }
+        if (plot_cpu1){
+            temp_x.push([time]);
+            temp_y.push([cpu_vals[1]]);
+            temp_ind.push(1);
+        }
+        if (plot_cpu2){
+            temp_x.push([time]);
+            temp_y.push([cpu_vals[2]]);
+            temp_ind.push(2);
+        }
+        if (plot_cpu3){
+            temp_x.push([time]);
+            temp_y.push([cpu_vals[3]]);
+            temp_ind.push(3);
+        }
+        if (plot_cpu_total){
+            temp_x.push([time]);
+            temp_y.push([cpu_msg.total_cpu_load]);
+            temp_ind.push(4);
+        }
+        if (plot_gpu){
+            temp_x.push([time]);
+            temp_y.push([cpu_msg.gpu_load]);
+            temp_ind.push(5);
+        }
+        if (plot_gpu_lp){
+            temp_x.push([time]);
+            temp_y.push([cpu_msg.gpu_load_avg]);
+            temp_ind.push(6);
+        }
+        if (plot_mem_temp){
+            temp_x.push([time]);
+            temp_y.push([cpu_msg.mem_t]);
+            temp_ind.push(7);
+        }
+        if (plot_mem_used){
+            temp_x.push([time]);
+            temp_y.push([cpu_msg.mem_use_mb]);
+            temp_ind.push(8);
+        }
+
+        var update = {
+            x: temp_x,
+            y: temp_y
+        }
+        Plotly.extendTraces(graph, update, temp_ind);
+        time_bck.setSeconds(time.getSeconds() - 30);
+        Plotly.relayout('graph', {'xaxis.range': [time_bck, time]});
+    }
+};
+
+</script>
+
+</body>
+</html>

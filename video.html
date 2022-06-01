@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<title>ModalAI VOXL Portal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="./css/w3.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<header>
+    <script src="./js/jquery-3.6.0.js"></script>
+    <script>
+    $(function(){
+      $("#header").load("header.html");
+    });
+    </script>
+    <div id="header" class="w3-container w3-green" style="height:50px; align-items: center; display:flex;">
+        <h1>VOXL Web Portal</h1>
+    </div>
+</header>
+
+<body>
+    <center>
+    <h3 id="name">
+    </h3>
+    <p>
+        <img id="image" width="50%" height="50%" />
+    </p>
+    </center>
+</body>
+
+<script >
+
+$(document).ready(function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    var name = document.getElementById("name");
+    var image = document.getElementById("image");
+    if(!urlParams.has('cam')){
+        name.innerHTML="No Camera Name Specified";
+    } else {
+        var cam_name = urlParams.get('cam');
+
+        name.innerHTML = getNiceName(cam_name);
+
+        image.setAttribute("src", "/video_raw/"+cam_name);
+    }
+});
+
+function getNiceName(string) {
+    var nameList = string.split("_");
+    for(var j = 0; j < nameList.length; j++){
+      if(nameList[j].length < 1) continue;
+      nameList[j] = nameList[j][0].toUpperCase() + nameList[j].substring(1);
+    }
+    return nameList.join(' ');
+}
+
+</script>
+
+</html>
