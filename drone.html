@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<title>ModalAI VOXL Portal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="./css/w3.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+    input:checked+.slider {
+        background-color: #2196F3 !important;
+    }
+
+    .slider {
+        background-color: #ccc !important;
+    }
+
+    .switch-container {
+        width: 100%;
+        display: flex;
+        justify-items: center;
+        align-items: center;
+    }
+
+    .switch-group {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+
+    .switch-group label:nth-child(2) {
+        margin-top: 24px;
+    }
+
+    .switch {
+        display: flex !important;
+        align-items: center;
+    }
+
+    .lable-name {
+        position: relative;
+        left: calc(100% + 12px);
+        font-size: 18px;
+        font-weight: 600 !important;
+    }
+
+    .btn-update {
+        margin-top: 32px;
+        cursor: pointer !important;
+    }
+</style>
+<header>
+    <script src="./js/jquery-3.6.0.js"></script>
+    <script>
+        $(function () {
+            $("#header").load("header.html");
+        });
+    </script>
+    <div id="header" class="w3-container w3-green" style="height:50px; align-items: center; display:flex;">
+        <h1>VOXL Web Portal</h1>
+    </div>
+</header>
+
+<body>
+    <div class="container">
+        <div id="people-setting">
+            <h2>People settings</h2>
+            <div class="switch-container">
+                <div class="switch-group">
+                    <label class="switch" name="lala">
+                        <input class="w3-button w3-block w3-blue" type="checkbox" id="people-stand" value="people.stand">
+                        <span class="slider round"></span>
+                        <p class="lable-name">Stand</p>
+                    </label>
+                    <label class="switch" name="lala">
+                        <input class="w3-button w3-block w3-blue" type="checkbox" id="people-lie" value="people.lie">
+                        <span class="slider round"></span>
+                        <p class="lable-name">Lie</p>
+                    </label>
+                </div>
+            </div>
+
+        </div>
+        <div id="vehicle-setting">
+            <h2>Vehilcle settings</h2>
+            <div class="switch-container">
+                <div class="switch-group">
+                    <label class="switch" name="lala">
+                        <input class="w3-button w3-block w3-blue" type="checkbox" id="vehicle-detect" value="vehicle.detect">
+                        <span class="slider round"></span>
+                        <p class="lable-name">Detect</p>
+                    </label>
+                    <label class="switch" name="lala">
+                        <input class="w3-button w3-block w3-blue" type="checkbox" id="vehicle-bicycle" value="vehicle.bicycle">
+                        <span class="slider round"></span>
+                        <p class="lable-name">Bicycle</p>
+                    </label>
+                </div>
+                <div class="switch-group">
+                    <label class="switch" name="lala">
+                        <input class="w3-button w3-block w3-blue" type="checkbox" id="vehicle-bus" value="vehicle.bus">
+                        <span class="slider round"></span>
+                        <p class="lable-name">Bus</p>
+                    </label>
+                    <label class="switch" name="lala">
+                        <input class="w3-button w3-block w3-blue" type="checkbox" id="vehicle-constructionVehicle" value="vehicle.constructionVehicle">
+                        <span class="slider round"></span>
+                        <p class="lable-name">Construction Vehicle</p>
+                    </label>
+                </div>
+                <div class="switch-group">
+                    <label class="switch" name="lala">
+                        <input class="w3-button w3-block w3-blue" type="checkbox" id="vehicle-colorVehicle" value="vehicle.colorVehicle">
+                        <span class="slider round"></span>
+                        <p class="lable-name">Color Vehicle</p>
+                    </label>
+                    <label class="switch" name="lala">
+                        <input class="w3-button w3-block w3-blue" type="checkbox" id="vehicle-truck" value="vehicle.truck">
+                        <span class="slider round"></span>
+                        <p class="lable-name">Truck</p>
+                    </label>
+                </div>
+                <div class="switch-group">
+                    <label class="switch" name="lala">
+                        <input class="w3-button w3-block w3-blue" type="checkbox" id="vehicle-motorcycle" value="vehicle.motorcycle">
+                        <span class="slider round"></span>
+                        <p class="lable-name">Motorcycle</p>
+                    </label>
+                    <label class="switch" name="lala">
+                        <input class="w3-button w3-block w3-blue" type="checkbox" id="vehicle-car" value="vehicle.car">
+                        <span class="slider round"></span>
+                        <p class="lable-name">Car</p>
+                    </label>
+                </div>
+            </div>
+
+        </div>
+
+        <button class="w3-button w3-green btn-update" >Update Setting</button>
+    </div>
+</body>
+<script src="js/drone.js"></script>
+
+</html>
