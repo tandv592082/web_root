@@ -50,6 +50,16 @@ function getSettings() {
 }
 
 
+function noData() {
+    $('.container').hide();
+    $('body').append(`<h1>LỖI KHI LẤY DỮ LIỆU RỒI BẠN Ạ 🤢</h1>`)
+}
+
+function setNotification(isSuccess) {
+    $(".notification").show().addClass(isSuccess ? 'w3-green' : 'w3-red').removeClass(isSuccess ? 'w3-red' : 'w3-green');
+    $(".message").text(isSuccess ? '👌 Bạn nhớ 💕💕💕' : '🤢 Lỗi rồi bạn ạ')
+}
+
 $('.btn-update').click(async () => {
     await updateDroneSetting(getSettings())
 })
@@ -69,8 +79,10 @@ async function updateDroneSetting(data) {
         console.log(data);
         const jData = await response.json();
         console.log(jData);
+        setNotification(true);
     } catch (error) {
         console.log(error);
+        setNotification(false);
     } finally {
         releaseLoading();
     }
@@ -84,6 +96,7 @@ async function updateDroneSetting(data) {
         setSettings(data);
     } catch (error) {
         console.log(error);
+        noData();
     } finally {
         releaseLoading();
     }
