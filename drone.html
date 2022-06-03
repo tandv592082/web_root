@@ -26,7 +26,7 @@
         flex: 1;
     }
 
-    .switch-group label:nth-child(2) {
+    .switch-group label:not(:nth-child(1)) {
         margin-top: 24px;
     }
 
@@ -68,79 +68,81 @@
       </div> 
     <div class="container">
         <div id="people-setting">
-            <h2>People settings</h2>
+            <h2>Cài đặt dành cho người</h2>
             <div class="switch-container">
                 <div class="switch-group">
                     <label class="switch" name="lala">
                         <input class="w3-button w3-block w3-blue" type="checkbox" id="people-stand" value="people.stand">
                         <span class="slider round"></span>
-                        <p class="lable-name">Stand</p>
+                        <p class="lable-name">Đứng</p>
                     </label>
                     <label class="switch" name="lala">
                         <input class="w3-button w3-block w3-blue" type="checkbox" id="people-lie" value="people.lie">
                         <span class="slider round"></span>
-                        <p class="lable-name">Lie</p>
+                        <p class="lable-name">Nằm</p>
                     </label>
                 </div>
             </div>
 
         </div>
         <div id="vehicle-setting">
-            <h2>Vehilcle settings</h2>
+            <h2>Cài đặt dành cho phương tiện</h2>
             <div class="switch-container">
                 <div class="switch-group">
                     <label class="switch" name="lala">
-                        <input class="w3-button w3-block w3-blue" type="checkbox" id="vehicle-detect" value="vehicle.detect">
+                        <input class="w3-button w3-block w3-blue" type="checkbox" id="vehicle-colorVehicle-red" value="vehicle.detect">
                         <span class="slider round"></span>
-                        <p class="lable-name">Detect</p>
+                        <p class="lable-name">Xe màu đỏ</p>
                     </label>
                     <label class="switch" name="lala">
-                        <input class="w3-button w3-block w3-blue" type="checkbox" id="vehicle-bicycle" value="vehicle.bicycle">
+                        <input class="w3-button w3-block w3-blue" type="checkbox" id="vehicle-colorVehicle-white" value="vehicle.constructionVehicle">
                         <span class="slider round"></span>
-                        <p class="lable-name">Bicycle</p>
+                        <p class="lable-name">Xe màu trắng</p>
                     </label>
+                    
                 </div>
                 <div class="switch-group">
+                    <label class="switch" name="lala">
+                        <input class="w3-button w3-block w3-blue" type="checkbox" id="vehicle-colorVehicle-black" value="vehicle.constructionVehicle">
+                        <span class="slider round"></span>
+                        <p class="lable-name">Xe màu đen</p>
+                    </label>
                     <label class="switch" name="lala">
                         <input class="w3-button w3-block w3-blue" type="checkbox" id="vehicle-bus" value="vehicle.bus">
                         <span class="slider round"></span>
-                        <p class="lable-name">Bus</p>
+                        <p class="lable-name">Xe Bus</p>
                     </label>
-                    <label class="switch" name="lala">
-                        <input class="w3-button w3-block w3-blue" type="checkbox" id="vehicle-constructionVehicle" value="vehicle.constructionVehicle">
-                        <span class="slider round"></span>
-                        <p class="lable-name">Construction Vehicle</p>
-                    </label>
+                    
                 </div>
                 <div class="switch-group">
                     <label class="switch" name="lala">
-                        <input class="w3-button w3-block w3-blue" type="checkbox" id="vehicle-colorVehicle" value="vehicle.colorVehicle">
+                        <input class="w3-button w3-block w3-blue" type="checkbox" id="vehicle-bicycle" value="vehicle.bicycle">
                         <span class="slider round"></span>
-                        <p class="lable-name">Color Vehicle</p>
+                        <p class="lable-name">Xe đạp</p>
                     </label>
                     <label class="switch" name="lala">
                         <input class="w3-button w3-block w3-blue" type="checkbox" id="vehicle-truck" value="vehicle.truck">
                         <span class="slider round"></span>
-                        <p class="lable-name">Truck</p>
+                        <p class="lable-name">Xe tải</p>
                     </label>
                 </div>
                 <div class="switch-group">
                     <label class="switch" name="lala">
                         <input class="w3-button w3-block w3-blue" type="checkbox" id="vehicle-motorcycle" value="vehicle.motorcycle">
                         <span class="slider round"></span>
-                        <p class="lable-name">Motorcycle</p>
+                        <p class="lable-name">Xe máy</p>
                     </label>
                     <label class="switch" name="lala">
                         <input class="w3-button w3-block w3-blue" type="checkbox" id="vehicle-car" value="vehicle.car">
                         <span class="slider round"></span>
-                        <p class="lable-name">Car</p>
+                        <p class="lable-name">Ô tô</p>
                     </label>
                 </div>
             </div>
 
         </div>
 
-        <button class="w3-button w3-green btn-update" >Update Setting</button>
+        <button class="w3-button w3-green btn-update" >Cập nhật</button>
     </div>
 </body>
 <script src="js/drone.js"></script>

@@ -1,4 +1,5 @@
 const API_URL = "http://192.168.1.244:8080/";
+// const API_URL = "http://192.168.1.102:8080/";
 
 function setLoading() {
     $.each( $("input[id^='people-']"), function () {
@@ -31,19 +32,27 @@ function setSettings(settings){
     });
 
     $.each( $("input[id^='vehicle-']"), function () {
-        $(this).attr("checked", !!settings['vehicle'][$(this).attr('id').split("vehicle-")[1]]);
+        if($(this).attr('id').includes("colorVehicle")) {
+            $(this).attr("checked", !!settings['vehicle']["colorVehicle"][$(this).attr('id').split("vehicle-colorVehicle-")[1]]);
+        } else {
+            $(this).attr("checked", !!settings['vehicle'][$(this).attr('id').split("vehicle-")[1]]);
+        }
     });
 }
 
 function getSettings() {
-    const setting = {people: {}, vehicle: {}};
+    const setting = {people: {}, vehicle: {colorVehicle: {}}};
 
     $.each( $("input[id^='people-']"), function () {
         setting['people'][$(this).attr('id').split("people-")[1]] = +$(this).is(":checked");
     });
 
     $.each( $("input[id^='vehicle-']"), function () {
-        setting['vehicle'][$(this).attr('id').split("vehicle-")[1]] = +$(this).is(":checked");
+        if($(this).attr('id').includes("colorVehicle")) {
+            setting['vehicle']["colorVehicle"][$(this).attr('id').split("vehicle-colorVehicle-")[1]] = +$(this).is(":checked");
+        } else {
+            setting['vehicle'][$(this).attr('id').split("vehicle-")[1]] = +$(this).is(":checked");
+        }
     });
 
     return setting;
@@ -70,7 +79,7 @@ async function updateDroneSetting(data) {
     try {
         setLoading();
         const response = await fetch(API_URL, {
-            method: 'PUT',
+            method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'
             },
