@@ -40,6 +40,7 @@
         left: calc(100% + 12px);
         font-size: 18px;
         font-weight: 600 !important;
+        white-space: nowrap !important;
     }
 
     .btn-update {
@@ -49,6 +50,27 @@
     .notification {
         display: none;
     }
+    .container {
+        padding-right: 15px;
+        padding-left: 15px;
+        margin-right: auto;
+        margin-left: auto;
+      }
+      @media (min-width: 768px) {
+        .container {
+          width: 750px;
+        }
+      }
+      @media (min-width: 992px) {
+        .container {
+          width: 970px;
+        }
+      }
+      @media (min-width: 1200px) {
+        .container {
+          width: 1170px;
+        }
+      }
 </style>
 <header>
     <script src="./js/jquery-3.6.0.js"></script>
@@ -67,8 +89,9 @@
         <h3 class="message">Success!</h3>
       </div> 
     <div class="container">
+        <!-- REGION PEOPLE SETTINGS -->
         <div id="people-setting">
-            <h2>Cài đặt dành cho người</h2>
+            <h2>Cài đặt nhận diện dành cho người</h2>
             <div class="switch-container">
                 <div class="switch-group">
                     <label class="switch" name="lala">
@@ -83,30 +106,41 @@
                     </label>
                 </div>
             </div>
-
         </div>
-        <div id="vehicle-setting">
-            <h2>Cài đặt dành cho phương tiện</h2>
+
+        <!-- REGION CAR SETTINGS -->
+        <div id="car-setting">
+            <h2>Cài đặt nhận diện dành xe ô tô</h2>
             <div class="switch-container">
                 <div class="switch-group">
                     <label class="switch" name="lala">
-                        <input class="w3-button w3-block w3-blue" type="checkbox" id="vehicle-colorVehicle-red" value="vehicle.detect">
+                        <input class="w3-button w3-block w3-blue" type="checkbox" id="car-red" value="car.red">
                         <span class="slider round"></span>
                         <p class="lable-name">Xe màu đỏ</p>
                     </label>
-                    <label class="switch" name="lala">
-                        <input class="w3-button w3-block w3-blue" type="checkbox" id="vehicle-colorVehicle-white" value="vehicle.constructionVehicle">
-                        <span class="slider round"></span>
-                        <p class="lable-name">Xe màu trắng</p>
-                    </label>
-                    
                 </div>
                 <div class="switch-group">
                     <label class="switch" name="lala">
-                        <input class="w3-button w3-block w3-blue" type="checkbox" id="vehicle-colorVehicle-black" value="vehicle.constructionVehicle">
+                        <input class="w3-button w3-block w3-blue" type="checkbox" id="car-white" value="car.white">
+                        <span class="slider round"></span>
+                        <p class="lable-name">Xe màu trắng</p>
+                    </label>
+                </div>
+                <div class="switch-group">
+                    <label class="switch" name="lala">
+                        <input class="w3-button w3-block w3-blue" type="checkbox" id="car-black" value="car.black">
                         <span class="slider round"></span>
                         <p class="lable-name">Xe màu đen</p>
                     </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- REGION VEHICLE SETTINGS -->
+        <div id="vehicle-setting">
+            <h2>Cài đặt nhận diện dành cho phương tiện</h2>
+            <div class="switch-container">
+                <div class="switch-group">
                     <label class="switch" name="lala">
                         <input class="w3-button w3-block w3-blue" type="checkbox" id="vehicle-bus" value="vehicle.bus">
                         <span class="slider round"></span>
@@ -120,6 +154,8 @@
                         <span class="slider round"></span>
                         <p class="lable-name">Xe đạp</p>
                     </label>
+                </div>
+                <div class="switch-group">
                     <label class="switch" name="lala">
                         <input class="w3-button w3-block w3-blue" type="checkbox" id="vehicle-truck" value="vehicle.truck">
                         <span class="slider round"></span>
@@ -131,11 +167,6 @@
                         <input class="w3-button w3-block w3-blue" type="checkbox" id="vehicle-motorcycle" value="vehicle.motorcycle">
                         <span class="slider round"></span>
                         <p class="lable-name">Xe máy</p>
-                    </label>
-                    <label class="switch" name="lala">
-                        <input class="w3-button w3-block w3-blue" type="checkbox" id="vehicle-car" value="vehicle.car">
-                        <span class="slider round"></span>
-                        <p class="lable-name">Ô tô</p>
                     </label>
                 </div>
             </div>

@@ -31,29 +31,30 @@ function setSettings(settings){
         $(this).attr("checked", !!settings['people'][$(this).attr('id').split("people-")[1]]);
     });
 
+    $.each( $("input[id^='car-']"), function () {
+        $(this).attr("checked", !!settings['car'][$(this).attr('id').split("car-")[1]]);
+    });
+
     $.each( $("input[id^='vehicle-']"), function () {
-        if($(this).attr('id').includes("colorVehicle")) {
-            $(this).attr("checked", !!settings['vehicle']["colorVehicle"][$(this).attr('id').split("vehicle-colorVehicle-")[1]]);
-        } else {
-            $(this).attr("checked", !!settings['vehicle'][$(this).attr('id').split("vehicle-")[1]]);
-        }
+        $(this).attr("checked", !!settings['vehicle'][$(this).attr('id').split("vehicle-")[1]]);
     });
 }
 
 function getSettings() {
-    const setting = {people: {}, vehicle: {colorVehicle: {}}};
+    const setting = {people: {}, vehicle: {}, car: {}};
 
     $.each( $("input[id^='people-']"), function () {
         setting['people'][$(this).attr('id').split("people-")[1]] = +$(this).is(":checked");
     });
 
-    $.each( $("input[id^='vehicle-']"), function () {
-        if($(this).attr('id').includes("colorVehicle")) {
-            setting['vehicle']["colorVehicle"][$(this).attr('id').split("vehicle-colorVehicle-")[1]] = +$(this).is(":checked");
-        } else {
-            setting['vehicle'][$(this).attr('id').split("vehicle-")[1]] = +$(this).is(":checked");
-        }
+    $.each( $("input[id^='car-']"), function () {
+        setting['car'][$(this).attr('id').split("car-")[1]] = +$(this).is(":checked");
     });
+
+    $.each( $("input[id^='vehicle-']"), function () {
+        setting['vehicle'][$(this).attr('id').split("vehicle-")[1]] = +$(this).is(":checked");
+    });
+
 
     return setting;
 }
