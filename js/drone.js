@@ -1,4 +1,4 @@
-const API_URL = location.hostname + ":8080/";
+const API_URL = "http://" + location.hostname + ":8080/";
 console.log(location.hostname);
 function setLoading() {
     $.each( $("input[id^='people-']"), function () {
