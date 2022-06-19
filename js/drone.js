@@ -1,5 +1,7 @@
-const API_URL = "http://" + location.hostname + ":8080/";
-console.log(location.hostname);
+const API_URL = `http://${location.hostname}:8080/`;
+// const API_URL = `http://192.168.1.102:8080/`;
+console.log(API_URL);
+
 function setLoading() {
     $.each( $("input[id^='people-']"), function () {
         $(this).attr("disabled", true);
@@ -37,6 +39,8 @@ function setSettings(settings){
     $.each( $("input[id^='vehicle-']"), function () {
         $(this).attr("checked", !!settings['vehicle'][$(this).attr('id').split("vehicle-")[1]]);
     });
+
+    $('#saveImage').attr("checked", !!settings['saveImage']);
 }
 
 function getSettings() {
@@ -54,6 +58,7 @@ function getSettings() {
         setting['vehicle'][$(this).attr('id').split("vehicle-")[1]] = +$(this).is(":checked");
     });
 
+    setting['saveImage'] = +$('#saveImage').is(":checked");
 
     return setting;
 }
@@ -102,6 +107,7 @@ async function updateDroneSetting(data) {
         setLoading();
         const response =  await fetch(API_URL);
         const data = await response.json();
+        console.log(data);
         setSettings(data);
     } catch (error) {
         console.log(error);
